@@ -59,21 +59,23 @@ async def work(ctx, *, mode):
         total_time[user_id] += session_time
         hours = session_time // 3600
         minutes = (session_time % 3600) // 60
-        seconds = session_time % 3600
+        seconds = session_time % 60
         total_hours = total_time[user_id] // 3600
         total_minutes = (total_time[user_id] % 3600) // 60
-        total_seconds = total_time[user_id] % 3600
+        total_seconds = total_time[user_id] % 60
         await ctx.send(f"{ctx.author.mention} worked for {hours} hours, {minutes} minutes and {seconds} seconds")
         await ctx.send(f"in total, {ctx.author.mention} worked {total_hours} hours, {total_minutes} minutes, and {total_seconds} seconds")
+        print(total_time)
     elif mode == 'help':
         await ctx.send("to start your work session, use `!work start` and to end it use `!work end`")
     else:
         await ctx.send("not valid syntax bud, use `!work help` to use")
+# parses if nothing is there
 @work.error
 async def work_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("you have to put a word after the command, use `!work help` for more info")
-
+# checks amount of time worked
 @bot.command()
 async def checktime(ctx):
     user_id = ctx.author.id
@@ -81,9 +83,24 @@ async def checktime(ctx):
         session_time = int(time.time() - working_start_time[user_id])
         hours = session_time // 3600
         minutes = (session_time % 3600) // 60
-        seconds = session_time % 3600
+        seconds = session_time % 60
         await ctx.send(f"you have worked for {hours} hours, {minutes} minutes and {seconds} seconds")
     else:
         await ctx.send("bro you arent even working")
+# leaderboard
+@bot.command()
+async def leaderboard(ctx):
+    finalString = ""
+    sorted_times = dict(sorted(total_time.items(), key=lambda x: x[1], reverse=True))
+    print(sorted_times)
+    text = []
+    for i, (user, time) in enumerate(sorted_times.items(), 1):
+        hours = time // 3600
+        minutes = (time % 3600) // 60
+        seconds = time % 60
+        text.append(f"#{i}: <@{user}>, time working: {hours} hours, {minutes} minutes and {seconds} seconds \n")
+    finalString = "".join(text)
+    embed = discord.Embed(title='leaderboard', description=finalString)
+    await ctx.send(embed=embed, silent=True)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
