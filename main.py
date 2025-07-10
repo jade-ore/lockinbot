@@ -34,6 +34,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # variables used for work command
 working_start_time = {}
 total_time = {}
+created_roles = {}
 # generate leaderboard
 async def generate_leaderboard_embed():
     text = []
@@ -44,8 +45,8 @@ async def generate_leaderboard_embed():
         minutes = (time % 3600) // 60
         seconds = time % 60
         text.append(f"#{i}: <@{user}>, time working: {hours}h {minutes}m {seconds}s")
-    
-    return discord.Embed(title='Leaderboard', description="\n".join(text))
+    color = int("FFFF00", 16)
+    return discord.Embed(color=color, title='Leaderboard', description="\n".join(text))
 
 # reset leaderboard
 @tasks.loop(time=datetime.time(hour=5, minute=0))
@@ -70,14 +71,17 @@ async def work(ctx, *, mode):
     user_id = ctx.author.id
     if mode == 'start':
         if user_id in working_start_time:
-            await ctx.send("bro you are already working")
+            embed = discord.Embed(color=int("FF0000", 16), title="locked in already", description="you're already working :3")
+            await ctx.send(embed=embed)
             return
         working_start_time[user_id] = time.time()
-        print(working_start_time)
-        await ctx.send(f"{ctx.author.mention} started a work session, yall should join in and also work - use `!work end` to end and use `!checktime` to see how much you've been working")
+        color = int("d883f2", 16)
+        embed = discord.Embed(color=color, title="started working", description=f"{ctx.author.mention} started a work session! you guys should join too :3 \nuse `!work end` to end the session\nuse `!checktime` to see how much you've been working")
+        await ctx.send(embed=embed)
     elif mode == 'end':
         if not user_id in working_start_time:
-            await ctx.send("bruh start working before you can end")
+            embed= discord.Embed(color=int("FF0000", 16), title="lazy bum", description="bruh start working before you can end")
+            await ctx.send(embed=embed)
             return
         if user_id not in total_time:
             total_time[user_id] = 0
@@ -89,18 +93,23 @@ async def work(ctx, *, mode):
         total_hours = total_time[user_id] // 3600
         total_minutes = (total_time[user_id] % 3600) // 60
         total_seconds = total_time[user_id] % 60
-        await ctx.send(f"{ctx.author.mention} worked for {hours} hours, {minutes} minutes and {seconds} seconds")
-        await ctx.send(f"in total, {ctx.author.mention} worked {total_hours} hours, {total_minutes} minutes, and {total_seconds} seconds")
+        color = int("80f2ff", 16)
+        embed = discord.Embed(color=color, title="work session end", description=f"nice work {ctx.author.mention}! you worked:\n\n{hours} hours, {minutes} minutes and {seconds} seconds\n\nin total today, you have worked:\n\n{total_hours} hours, {total_minutes} minutes, and {total_seconds} seconds")
+        await ctx.send(embed=embed)
         print(total_time)
     elif mode == 'help':
-        await ctx.send("to start your work session, use `!work start` and to end it use `!work end` use `!leaderboard` to see the leaderboard")
+        color = int("00FF00", 16)
+        embed = discord.Embed(title="work command guide", description="\n\nto start your work session, use `!work start`\n to end a work session use `!work end` \nuse `!leaderboard` to see the leaderboard", color=color)
+        await ctx.send(embed=embed)
     else:
-        await ctx.send("not valid syntax bud, use `!work help` to use")
+        embed = discord.Embed(color=int("FF0000", 16), title="i dont understand", description="not valid syntax bud\n use `!work help` to use")
+        await ctx.send(embed=embed)
 # parses if nothing is there
 @work.error
 async def work_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("you have to put a word after the command, use `!work help` for more info")
+        embed = discord.Embed(color=int("FF0000", 16), title="i dont understand", description="\nyou have to put a word after the command, use `!work help` for more info")
+        await ctx.send(embed=embed)
 # checks amount of time worked
 @bot.command()
 async def checktime(ctx):
@@ -110,14 +119,56 @@ async def checktime(ctx):
         hours = session_time // 3600
         minutes = (session_time % 3600) // 60
         seconds = session_time % 60
-        await ctx.send(f"you have worked for {hours} hours, {minutes} minutes and {seconds} seconds")
+        embed = discord.Embed(color=int("d883f2", 16), title="how long you worked", description=f"hey <@{ctx.author.id}>! \n\nyou have worked for {hours} hours, {minutes} minutes and {seconds} seconds\n\nnow get back to work :3")
+        await ctx.send(embed=embed)
     else:
-        await ctx.send("bro you arent even working")
+        embed = discord.Embed(color=int("FF0000", 16), title="lazy bum", description="bro you arent even working")
+        await ctx.send(embed=embed)
 # leaderboard
 @bot.command()
 async def leaderboard(ctx):
     embed = await generate_leaderboard_embed()
-    await ctx.send(embed=embed, silent=True)
+    await ctx.send(embed=embed)
+# role maker
+@bot.command()
+async def rolecreate(ctx, color, *, roleName):
+    guild = ctx.guild
+    if ctx.author.id not in created_roles:
+        created_roles[ctx.author.id] = []
+    if color.startswith('#'):
+        color = color[1:]
+    try:
+        color_int = int(color, 16)
+        role = await guild.create_role(name=roleName, colour=discord.Colour(color_int))
+        created_roles[ctx.author.id].append(role.id)
+        await ctx.author.add_roles(role)
+        embed = discord.Embed(color=int("00FF00", 16),title="role created! :3", description=f"created role '{roleName}' with color #{color}")
+        await ctx.send(embed=embed)
+    except ValueError:
+        embed = discord.Embed(color=int("FF0000",16),title="invalid color", description="use hex color format (#FF0000 or FF0000)")
+        await ctx.send(embed=embed)
+        
+@bot.command()
+async def roledelete(ctx, inputrole):
+    guild = ctx.guild
+    role = discord.utils.get(guild.roles, name=inputrole)
+    if not role:
+        embed = discord.Embed(color=int("FF0000",16),title="nonexistent?!", description="this role doesnt exist`")
+        await ctx.send(embed=embed)
+        return
+    if role.id not in created_roles[ctx.author.id]:
+        embed = discord.Embed(color=int("FF0000",16),title="no grief :3", description="you can only delete roles you made\nto make a role use `!rolecreate`")
+        await ctx.send(embed=embed)
+        return
+    await role.delete()
+    embed = discord.Embed(color=int("fc9e3f", 16), title="executed! >:3", description=f"deleted role {role}")
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def rolehelp(ctx):
+    color = int("00FF00", 16)
+    embed = discord.Embed(colour=color, title="Role help", description="\n!rolecreate `<hex color>` `<role name>` this is to create a role, make sure you use hex numbers\n!roledelete `<name>` you can only delete roles that you created")
+    await ctx.send(embed=embed)
 
 webserver.keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
