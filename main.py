@@ -74,7 +74,7 @@ async def work(ctx, *, mode):
             return
         working_start_time[user_id] = time.time()
         print(working_start_time)
-        await ctx.send(f"{ctx.author.mention} started a work session, yall should join in and also work - use `!work end` to end")
+        await ctx.send(f"{ctx.author.mention} started a work session, yall should join in and also work - use `!work end` to end and use `!checktime` to see how much you've been working")
     elif mode == 'end':
         if not user_id in working_start_time:
             await ctx.send("bruh start working before you can end")
@@ -93,7 +93,7 @@ async def work(ctx, *, mode):
         await ctx.send(f"in total, {ctx.author.mention} worked {total_hours} hours, {total_minutes} minutes, and {total_seconds} seconds")
         print(total_time)
     elif mode == 'help':
-        await ctx.send("to start your work session, use `!work start` and to end it use `!work end`")
+        await ctx.send("to start your work session, use `!work start` and to end it use `!work end` use !leaderboard to see the leaderboard")
     else:
         await ctx.send("not valid syntax bud, use `!work help` to use")
 # parses if nothing is there
