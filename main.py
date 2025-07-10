@@ -1,9 +1,10 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import logging
 from dotenv import load_dotenv
 import os
 import time
+import datetime
 
 # get the token
 load_dotenv(dotenv_path='.env', verbose=True)
@@ -32,11 +33,35 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # variables used for work command
 working_start_time = {}
 total_time = {}
+# generate leaderboard
+async def generate_leaderboard_embed():
+    text = []
+    sorted_times = dict(sorted(total_time.items(), key=lambda x: x[1], reverse=True))
+    
+    for i, (user, time) in enumerate(sorted_times.items(), 1):
+        hours = time // 3600
+        minutes = (time % 3600) // 60
+        seconds = time % 60
+        text.append(f"#{i}: <@{user}>, time working: {hours}h {minutes}m {seconds}s")
+    
+    return discord.Embed(title='Leaderboard', description="\n".join(text))
+
+# reset leaderboard
+@tasks.loop(time=datetime.time(hour=5, minute=0))
+async def resetLeaderboard():
+    global total_time
+    embed = await generate_leaderboard_embed()
+    channel = bot.get_channel(1380594904627019827)
+    if channel:
+        await channel.send("This is the leaderboard for today")
+        await channel.send(embed=embed)
+    total_time = {}
 
 # prints when bot is ready
 @bot.event
 async def on_ready():
     print(f"ready to go in {bot.user.name}")
+    resetLeaderboard.start()
 
 # work command
 @bot.command()
@@ -90,17 +115,7 @@ async def checktime(ctx):
 # leaderboard
 @bot.command()
 async def leaderboard(ctx):
-    finalString = ""
-    sorted_times = dict(sorted(total_time.items(), key=lambda x: x[1], reverse=True))
-    print(sorted_times)
-    text = []
-    for i, (user, time) in enumerate(sorted_times.items(), 1):
-        hours = time // 3600
-        minutes = (time % 3600) // 60
-        seconds = time % 60
-        text.append(f"#{i}: <@{user}>, time working: {hours} hours, {minutes} minutes and {seconds} seconds \n")
-    finalString = "".join(text)
-    embed = discord.Embed(title='leaderboard', description=finalString)
+    embed = await generate_leaderboard_embed()
     await ctx.send(embed=embed, silent=True)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
