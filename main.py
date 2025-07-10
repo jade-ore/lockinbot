@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import time
 import datetime
+import webserver
 
 # get the token
 load_dotenv(dotenv_path='.env', verbose=True)
@@ -118,4 +119,5 @@ async def leaderboard(ctx):
     embed = await generate_leaderboard_embed()
     await ctx.send(embed=embed, silent=True)
 
+webserver.keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
