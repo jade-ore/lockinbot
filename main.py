@@ -112,18 +112,36 @@ async def work_error(ctx, error):
         await ctx.send(embed=embed)
 # checks amount of time worked
 @bot.command()
-async def checktime(ctx):
+async def checktime(ctx, member: discord.Member = None):
     user_id = ctx.author.id
-    if user_id in working_start_time:
+    if member:
+        user_id = member.id
+        member_check = ctx.guild.get_member(user_id)
+        if member_check == None:
+            await ctx.send("this person doesnt even exist")
+            return
+        if user_id not in working_start_time:
+            embed = discord.Embed(color=int("FF0000", 16), title="lazy bum", description="bro they arent even working")
+            await ctx.send(embed=embed)
+            return
+        session_time = int(time.time() - working_start_time[user_id])
+        hours = session_time // 3600
+        minutes = (session_time % 3600) // 60            
+        seconds = session_time % 60
+        embed = discord.Embed(color=int("d883f2", 16), title="how long they worked", description=f"hey <@{ctx.author.id}>! \n\n<@{user_id}> has worked for {hours} hours, {minutes} minutes and {seconds} seconds\n\nnow get back to work :3")
+        await ctx.send(embed=embed)
+    else:
+        if user_id not in working_start_time:
+            embed = discord.Embed(color=int("FF0000", 16), title="lazy bum", description="bro you arent even working")
+            await ctx.send(embed=embed)
+            return
         session_time = int(time.time() - working_start_time[user_id])
         hours = session_time // 3600
         minutes = (session_time % 3600) // 60
         seconds = session_time % 60
         embed = discord.Embed(color=int("d883f2", 16), title="how long you worked", description=f"hey <@{ctx.author.id}>! \n\nyou have worked for {hours} hours, {minutes} minutes and {seconds} seconds\n\nnow get back to work :3")
         await ctx.send(embed=embed)
-    else:
-        embed = discord.Embed(color=int("FF0000", 16), title="lazy bum", description="bro you arent even working")
-        await ctx.send(embed=embed)
+
 # leaderboard
 @bot.command()
 async def leaderboard(ctx):
@@ -169,6 +187,36 @@ async def rolehelp(ctx):
     color = int("00FF00", 16)
     embed = discord.Embed(colour=color, title="Role help", description="\n!rolecreate `<hex color>` `<role name>` this is to create a role, make sure you use hex numbers\n!roledelete `<name>` you can only delete roles that you created")
     await ctx.send(embed=embed)
+
+@bot.command()
+async def admin(ctx, command, id_input, time_input):
+    id = int(id_input)
+    int_time = int(time_input)
+    if not int(ctx.author.id) == 876561372354318396:
+        await ctx.send("you arent jayden so you cant use this command")
+        return
+    if command == "forcestop":
+        fake_time = int(time.time() - working_start_time.pop(id))
+        hours = fake_time // 3600
+        minutes = (fake_time % 3600) // 60
+        seconds = fake_time % 60
+        embed = discord.Embed(color=int("FF0000", 16), title="FORCEFULLY STOPPED!", description=f"<@{id}> was forcefully stopped\n\nthis person faked worked for {hours} hours, {minutes} minutes, and {seconds} seconds!!!\n\nno cheating >:(")
+        await ctx.send(embed=embed)
+    if command == "removetime":
+        if time_input == None:
+            await ctx.send("you need to add a time broski")
+            return
+        time_of_id = total_time[id]
+        total_time[id] = time_of_id - int_time
+        embed = discord.Embed(color=int("FF0000", 16), title="TIME REMOVED!", description=f"removed {int_time} seconds")
+        await ctx.send(embed=embed)
+    if command == "addtime":
+        if time_input == None:
+            await ctx.send("you need to add a time broski")
+            return
+        total_time[id] = total_time[id] + int_time
+        embed = discord.Embed(color=int("00FF00", 16), title="TIME ADDED!", description=f"added {int_time} seconds")
+        await ctx.send(embed=embed)
 
 webserver.keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
