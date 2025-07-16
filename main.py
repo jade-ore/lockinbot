@@ -220,3 +220,4 @@ async def admin(ctx, command, id_input, time_input):
 
 webserver.keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+# reset
