@@ -216,7 +216,7 @@ async def admin(ctx, command, id_input, time_input):
             await ctx.send("you need to add a time broski")
             return
         if id not in total_time:
-            total_time[id] == 0
+            total_time[id] = 0
         total_time[id] = total_time[id] + int_time
         embed = discord.Embed(color=int("00FF00", 16), title="TIME ADDED!", description=f"added {int_time} seconds")
         await ctx.send(embed=embed)
