@@ -193,7 +193,7 @@ async def rolehelp(ctx):
 async def admin(ctx, command, id_input, time_input):
     id = int(id_input)
     int_time = int(time_input)
-    if not int(ctx.author.id) == 876561372354318396:
+    if not int(ctx.author.id) == 1224926925185880218:
         await ctx.send("you arent jayden so you cant use this command")
         return
     if command == "forcestop":
