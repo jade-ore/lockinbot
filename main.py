@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 import logging
 from dotenv import load_dotenv
 import os
+from os import system
 import time
 import datetime
 import webserver
@@ -219,5 +220,10 @@ async def admin(ctx, command, id_input, time_input):
         await ctx.send(embed=embed)
 
 webserver.keep_alive()
-bot.run(token)
+try:
+    bot.run(token=token)
+except discord.errors.HTTPException:
+    print("\n\n\nBLOCKED BY RATE LIMITS\nRESTARTING NOW\n\n\n")
+    system("python restarter.py")
+    system('kill 1')
 # reset
