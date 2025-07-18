@@ -219,5 +219,5 @@ async def admin(ctx, command, id_input, time_input):
         await ctx.send(embed=embed)
 
 webserver.keep_alive()
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+bot.run(token)
 # reset
