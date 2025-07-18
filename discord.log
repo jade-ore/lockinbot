@@ -1,4 +1,0 @@
-[2025-07-16 19:15:13] [INFO    ] discord.client: logging in using static token
-[2025-07-16 19:15:13] [DEBUG   ] discord.http: GET https://discord.com/api/v10/users/@me with None has returned 200
-[2025-07-16 19:15:13] [DEBUG   ] discord.http: GET /users/@me has found its initial rate limit bucket hash (78bb8553d9352a5a2f89f9def401287a).
-[2025-07-16 19:15:13] [DEBUG   ] discord.http: GET https://discord.com/api/v10/users/@me has received {'id': '1392892093902360626', 'username': 'bjhuygfrde56f7gyhu', 'avatar': None, 'discriminator': '2114', 'public_flags': 0, 'flags': 0, 'bot': True, 'banner': None, 'accent_color': None, 'global_name': None, 'avatar_decoration_data': None, 'collectibles': None, 'display_name_styles': None, 'banner_color': None, 'clan': None, 'primary_guild': None, 'mfa_enabled': False, 'locale': 'en-US', 'premium_type': 0, 'email': None, 'verified': True, 'bio': ''}
