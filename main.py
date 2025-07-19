@@ -72,7 +72,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
     for banned_word in banned_words:
-        if banned_word in message.lower():
+        if banned_word in message.content.lower():
             await message.delete()
             await message.channel.send("PLEASE CENSOR J*B")
     
