@@ -36,6 +36,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 working_start_time = {}
 total_time = {}
 created_roles = {}
+banned_words = ["job", "j ob", "jo b", "j o b"]
 # generate leaderboard
 async def generate_leaderboard_embed():
     text = []
@@ -65,6 +66,17 @@ async def resetLeaderboard():
 async def on_ready():
     print(f"ready to go in {bot.user.name}")
     resetLeaderboard.start()
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    for banned_word in banned_words:
+        if banned_word in message.lower():
+            await message.delete()
+            await message.channel.send("PLEASE CENSOR J*B")
+    
+    await bot.process_commands(message)
 
 # work command
 @bot.command()
