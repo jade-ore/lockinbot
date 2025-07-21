@@ -1,12 +1,4 @@
-import discord
-from discord.ext import commands, tasks
-import logging
-from dotenv import load_dotenv
-import os
-from os import system
-import time
-import datetime
-import webserver
+from settings import *
 
 # get the token
 load_dotenv(dotenv_path='.env', verbose=True)
@@ -71,10 +63,10 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
-    for banned_word in banned_words:
-        if banned_word in message.content.lower():
-            await message.delete()
-            await message.channel.send("PLEASE CENSOR J*B")
+    has_job = re.search(r"j+?([^a-z1-9])*?[op0]+?([^a-z1-9])*?[bd]+?", message.content, re.IGNORECASE)
+    if has_job:
+        await message.delete()
+        await message.channel.send(f"{message.author.mention} PLEASE CENSOR J*B")
     
     await bot.process_commands(message)
 
@@ -233,6 +225,19 @@ async def admin(ctx, command, id_input, time_input):
         embed = discord.Embed(color=int("00FF00", 16), title="TIME ADDED!", description=f"added {int_time} seconds")
         await ctx.send(embed=embed)
 
+@bot.command()
+async def update(ctx, command, user=None, start=None):
+    if command == "export":
+        await ctx.send("people who have worked")
+        for user, time in total_time.items():
+            await ctx.send(f"user: {user}, time:{time}")
+        await ctx.send("people who are currently working")
+        for user, time in working_start_time.items():
+            await ctx.send(f"user:{user}, UTC start time:{time}")
+    if command == "import":
+        working_start_time[int(user)] = float(start)
+        await ctx.send(f"added {user} to dict")
+        print(working_start_time)
 webserver.keep_alive()
 try:
     bot.run(token=token)
