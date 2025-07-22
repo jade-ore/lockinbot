@@ -28,7 +28,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 working_start_time = {}
 total_time = {}
 created_roles = {}
-banned_words = ["job", "j ob", "jo b", "j o b"]
+removed_time = {}
 # generate leaderboard
 async def generate_leaderboard_embed():
     text = []
@@ -70,6 +70,10 @@ async def on_message(message):
     
     await bot.process_commands(message)
 
+@bot.command()
+async def helppls(ctx):
+    embed = discord.Embed(color=int("FFFF00", 16), title="help", description="\n\n `!help` this command \n `!work help` gives you info about work\n`!rolehelp` gives you info about role \n`!selfremove <seconds>` removes time based on seconds\n`!selfremove undo` undo you selfremove if you remove too much\n`!calculateseconds <hours> <minutes> <seconds>` turns hours minutes seconds into seconds (example `!calculateseconds 1 0 0` would give 3600)")
+    await ctx.send(embed=embed)
 # work command
 @bot.command()
 async def work(ctx, *, mode):
@@ -170,7 +174,8 @@ async def rolecreate(ctx, color, *, roleName):
     except ValueError:
         embed = discord.Embed(color=int("FF0000",16),title="invalid color", description="use hex color format (#FF0000 or FF0000)")
         await ctx.send(embed=embed)
-        
+
+# role delete
 @bot.command()
 async def roledelete(ctx, inputrole):
     guild = ctx.guild
@@ -186,13 +191,13 @@ async def roledelete(ctx, inputrole):
     await role.delete()
     embed = discord.Embed(color=int("fc9e3f", 16), title="executed! >:3", description=f"deleted role {role}")
     await ctx.send(embed=embed)
-
+#role help 
 @bot.command()
 async def rolehelp(ctx):
     color = int("00FF00", 16)
     embed = discord.Embed(colour=color, title="Role help", description="\n!rolecreate `<hex color>` `<role name>` this is to create a role, make sure you use hex numbers\n!roledelete `<name>` you can only delete roles that you created")
     await ctx.send(embed=embed)
-
+# for jayden
 @bot.command()
 async def admin(ctx, command, id_input, time_input):
     id = int(id_input)
@@ -238,6 +243,34 @@ async def update(ctx, command, user=None, start=None):
         working_start_time[int(user)] = float(start)
         await ctx.send(f"added {user} to dict")
         print(working_start_time)
+
+@bot.command()
+async def selfremove(ctx, time):
+    if time == 'undo':
+        if ctx.author.id not in removed_time or removed_time[ctx.author.id] == 0:
+            await ctx.send("you never removed any time")
+            return
+        total_time[ctx.author.id] += removed_time[ctx.author.id]
+        removed_time[ctx.author.id] = 0
+    try:
+        if ctx.author.id not in total_time or total_time[ctx.author.id] < int(time):
+            await ctx.send("you didnt even work that amount of time :pensive:")
+            return
+        total_time[ctx.author.id] -= int(time)
+        await ctx.send(f"removed {time} seconds")
+        removed_time[ctx.author.id] = int(time)
+    except ValueError:
+        if time == 'undo':
+            return
+        await ctx.send("time must be a number in seconds")
+
+@bot.command()
+async def calculateseconds(ctx, hrs_input, mins_input, sec_input):
+    hrs = int(hrs_input)
+    mins = int(mins_input)
+    sec = int(sec_input)
+    await ctx.send(f"{hrs} hours {mins} minutes {sec} seconds is {(hrs * 3600) + (mins * 60) + sec} seconds in total")
+
 webserver.keep_alive()
 try:
     bot.run(token=token)
