@@ -38,7 +38,7 @@ async def generate_leaderboard_embed():
         hours = time // 3600
         minutes = (time % 3600) // 60
         seconds = time % 60
-        text.append(f"#{i}: <@{user}>, time working: {hours}h {minutes}m {seconds}s")
+        text.append(f"#{i}: <@{user}>, time working: {hours}h {minutes}m {seconds}s\n")
     color = int("FFFF00", 16)
     return discord.Embed(color=color, title='Leaderboard', description="\n".join(text))
 
@@ -72,7 +72,7 @@ async def on_message(message):
 
 @bot.command()
 async def helppls(ctx):
-    embed = discord.Embed(color=int("FFFF00", 16), title="help", description="\n\n `!help` this command \n `!work help` gives you info about work\n`!rolehelp` gives you info about role \n`!selfremove <seconds>` removes time based on seconds\n`!selfremove undo` undo you selfremove if you remove too much\n`!calculateseconds <hours> <minutes> <seconds>` turns hours minutes seconds into seconds (example `!calculateseconds 1 0 0` would give 3600)")
+    embed = discord.Embed(color=int("FFFF00", 16), title="help", description="\n\n `!helppls` this command \n `!work help` gives you info about work\n`!rolehelp` gives you info about role \n`!selfremove <seconds>` removes time based on seconds\n`!selfremove undo` undo you selfremove if you remove too much\n`!calculateseconds <hours> <minutes> <seconds>` turns hours minutes seconds into seconds (example `!calculateseconds 1 0 0` would give 3600)")
     await ctx.send(embed=embed)
 # work command
 @bot.command()
