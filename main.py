@@ -65,8 +65,9 @@ async def on_message(message):
         return
     has_job = re.search(r"j+?([^a-z1-9])*?[op0]+?([^a-z1-9])*?[bd]+?", message.content, re.IGNORECASE)
     if has_job:
-        await message.delete()
-        await message.channel.send(f"{message.author.mention} PLEASE CENSOR J*B")
+        pass
+        # await message.delete()
+        # await message.channel.send(f"{message.author.mention} PLEASE CENSOR J*B")
     
     await bot.process_commands(message)
 
