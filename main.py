@@ -3,6 +3,7 @@ from settings import *
 # get the token
 load_dotenv(dotenv_path='.env', verbose=True)
 token = os.getenv('DISCORD_TOKEN')
+ALLOWED_ID = 1067830715510706276
 
 # see if .env exists and gets key
 try:
@@ -29,6 +30,7 @@ working_start_time = {}
 total_time = {}
 created_roles = {}
 removed_time = {}
+banned_people = []
 # generate leaderboard
 async def generate_leaderboard_embed():
     text = []
@@ -61,13 +63,16 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    ctx = bot.get_context(message)
     if message.author == bot.user:
         return
     has_job = re.search(r"j+?([^a-z1-9])*?[op0]+?([^a-z1-9])*?[bd]+?", message.content, re.IGNORECASE)
     if has_job:
-        pass
-        # await message.delete()
-        # await message.channel.send(f"{message.author.mention} PLEASE CENSOR J*B")
+        await message.delete()
+        await message.channel.send(f"{message.author.mention} PLEASE CENSOR J*B")
+        if message.author.id == ALLOWED_ID:
+            await message.author.send("i know j*b is a very bad word but maybe you were typing a story heres your message just in case")
+            await message.author.send(message.content)
     
     await bot.process_commands(message)
 
@@ -79,6 +84,10 @@ async def helppls(ctx):
 @bot.command()
 async def work(ctx, *, mode):
     user_id = ctx.author.id
+    if ctx.author.id in banned_people:
+        embed = discord.Embed(color=int("FF0000", 16), title="you are BANNED!", description=f"\n<@{user_id}>you have gotten banned from using this bot, please go to jayden and explain why you should be unbanned alone with proof of you actually working")
+        await ctx.send(embed=embed)
+        return
     if mode == 'start':
         if user_id in working_start_time:
             embed = discord.Embed(color=int("FF0000", 16), title="locked in already", description="you're already working :3")
@@ -124,6 +133,10 @@ async def work_error(ctx, error):
 @bot.command()
 async def checktime(ctx, member: discord.Member = None):
     user_id = ctx.author.id
+    if ctx.author.id in banned_people:
+        embed = discord.Embed(color=int("FF0000", 16), title="you are BANNED!", description=f"\n<@{user_id}>you have gotten banned from using this bot, please go to jayden and explain why you should be unbanned alone with proof of you actually working")
+        await ctx.send(embed=embed)
+        return
     if member:
         user_id = member.id
         member_check = ctx.guild.get_member(user_id)
@@ -200,7 +213,7 @@ async def rolehelp(ctx):
     await ctx.send(embed=embed)
 # for jayden
 @bot.command()
-async def admin(ctx, command, id_input, time_input):
+async def admin(ctx, command, id_input, time_input=None):
     id = int(id_input)
     int_time = int(time_input)
     if not int(ctx.author.id) == 1224926925185880218:
@@ -247,6 +260,10 @@ async def update(ctx, command, user=None, start=None):
 
 @bot.command()
 async def selfremove(ctx, time):
+    if ctx.author.id in banned_people:
+        embed = discord.Embed(color=int("FF0000", 16), title="you are BANNED!", description=f"\n{ctx.author.id}>you have gotten banned from using this bot, please go to jayden and explain why you should be unbanned alone with proof of you actually working")
+        await ctx.send(embed=embed)
+        return
     if time == 'undo':
         if ctx.author.id not in removed_time or removed_time[ctx.author.id] == 0:
             await ctx.send("you never removed any time")
