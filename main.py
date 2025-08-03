@@ -31,6 +31,7 @@ total_time = {}
 created_roles = {}
 removed_time = {}
 banned_people = []
+job_filter_activated = False
 # generate leaderboard
 async def generate_leaderboard_embed():
     text = []
@@ -67,7 +68,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
     has_job = re.search(r"j+?([^a-z1-9])*?[op0]+?([^a-z1-9])*?[bd]+?", message.content, re.IGNORECASE)
-    if has_job:
+    if has_job and job_filter_activated:
         await message.delete()
         await message.channel.send(f"{message.author.mention} PLEASE CENSOR J*B")
         if message.author.id == ALLOWED_ID:
@@ -288,6 +289,16 @@ async def calculateseconds(ctx, hrs_input, mins_input, sec_input):
     mins = int(mins_input)
     sec = int(sec_input)
     await ctx.send(f"{hrs} hours {mins} minutes {sec} seconds is {(hrs * 3600) + (mins * 60) + sec} seconds in total")
+
+@bot.command()
+async def jobfilter(ctx, on_off):
+    global job_filter_activated
+    if on_off == "on":
+        job_filter_activated = True
+        await ctx.send("j*b filter on")
+    elif on_off == "off":
+        job_filter_activated = False
+        await ctx.send("job filter off")
 
 webserver.keep_alive()
 try:
