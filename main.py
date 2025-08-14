@@ -16,6 +16,9 @@ try:
 except FileNotFoundError:
     print("Could not find .env file manually")
 
+system("whoami")
+system("groups")
+print("first lsof")
 system("lsof -i:3456")
 
 # essential bot stuff
@@ -303,6 +306,7 @@ async def jobfilter(ctx, on_off):
         await ctx.send("job filter off")
 
 webserver.keep_alive()
+system("lsof -i:3456")
 try:
     bot.run(token=token)
 except discord.errors.HTTPException:
