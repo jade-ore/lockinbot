@@ -1,4 +1,13 @@
-from settings import *
+import discord
+from discord.ext import commands, tasks
+import logging
+from dotenv import load_dotenv
+import os
+from os import system
+import time
+import datetime
+import webserver
+import re
 
 # get the token
 load_dotenv(dotenv_path='.env', verbose=True)
@@ -15,13 +24,6 @@ try:
                 break
 except FileNotFoundError:
     print("Could not find .env file manually")
-
-system("whoami")
-system("groups")
-print("first lsof")
-system("lsof -i:3456")
-system("sudo lsof")
-
 # essential bot stuff
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 intents = discord.Intents.default()
@@ -212,6 +214,7 @@ async def roledelete(ctx, inputrole):
     await role.delete()
     embed = discord.Embed(color=int("fc9e3f", 16), title="executed! >:3", description=f"deleted role {role}")
     await ctx.send(embed=embed)
+
 #role help 
 @bot.command()
 async def rolehelp(ctx):
@@ -219,6 +222,7 @@ async def rolehelp(ctx):
     embed = discord.Embed(colour=color, title="Role help", description="\n!rolecreate `<hex color>` `<role name>` this is to create a role, make sure you use hex numbers\n!roledelete `<name>` you can only delete roles that you created")
     await ctx.send(embed=embed)
 # for jayden
+
 @bot.command()
 async def admin(ctx, command, id_input, time_input=None):
     id = int(id_input)
@@ -307,7 +311,6 @@ async def jobfilter(ctx, on_off):
         await ctx.send("job filter off")
 
 webserver.keep_alive()
-system("lsof -i:3456")
 try:
     bot.run(token=token)
 except discord.errors.HTTPException:
