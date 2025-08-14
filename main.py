@@ -315,6 +315,6 @@ try:
     bot.run(token=token)
 except discord.errors.HTTPException:
     print("\n\n\nBLOCKED BY RATE LIMITS\nRESTARTING NOW\n\n\n")
-    system('kill 1')
     system("python restarter.py")
+    system('kill 1')
 # reset
