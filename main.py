@@ -16,6 +16,8 @@ try:
 except FileNotFoundError:
     print("Could not find .env file manually")
 
+system("lsof -i:3456")
+
 # essential bot stuff
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 intents = discord.Intents.default()
