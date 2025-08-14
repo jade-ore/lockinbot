@@ -311,5 +311,10 @@ async def jobfilter(ctx, on_off):
         await ctx.send("job filter off")
 
 webserver.keep_alive()
-
-bot.run(token=token)
+try:
+    bot.run(token=token)
+except discord.errors.HTTPException:
+    print("\n\n\nBLOCKED BY RATE LIMITS\nRESTARTING NOW\n\n\n")
+    system('kill 1')
+    system("python restarter.py")
+# reset
