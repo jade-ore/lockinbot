@@ -20,6 +20,7 @@ system("whoami")
 system("groups")
 print("first lsof")
 system("lsof -i:3456")
+system("sudo lsof")
 
 # essential bot stuff
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
