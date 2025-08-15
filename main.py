@@ -310,8 +310,9 @@ async def jobfilter(ctx, on_off):
         job_filter_activated = False
         await ctx.send("job filter off")
 
+@bot.command
+async def loveyou(ctx):
+    await ctx.send("ty love you too :heart:")
 webserver.keep_alive()
-
-bot.run(token=token, )
-
+bot.run(token=token)
 # reset
